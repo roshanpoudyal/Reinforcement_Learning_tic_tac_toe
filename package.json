@@ -1,0 +1,31 @@
+{
+  "name": "package_tic_tac_toe",
+  "version": "1.0.0",
+  "description": "Implementation of Reinforcement Learning Algorithm to create an artificial agent which can play Tic Tac Toe against human (or another artificial agent).",
+  "main": "ticTacToeServer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/roshanpoudyal/tic_tac_toe_RL.git"
+  },
+  "keywords": [
+    "reinforcement-learning",
+    "tic-tac-toe",
+    "nodejs",
+    "javascript",
+    "html",
+    "c++"
+  ],
+  "author": "roshan.poudyal@uni-ulm.de",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/roshanpoudyal/tic_tac_toe_RL/issues"
+  },
+  "homepage": "https://github.com/roshanpoudyal/tic_tac_toe_RL#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2"
+  }
+}
