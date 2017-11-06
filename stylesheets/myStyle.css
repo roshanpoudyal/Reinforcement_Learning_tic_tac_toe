@@ -6,7 +6,12 @@ html, body {
     margin: 0;
     height: 100%;
     overflow: hidden;
-    border : 2px solid red;
+    /* border : 2px solid red; */
+}
+
+body h1 span{
+    font-size: 1.2em;
+    color: rgb(61, 13, 235);
 }
 
 div.playArea{
@@ -17,5 +22,68 @@ div.playArea{
     margin: 0;
     height: 80%;
     overflow: hidden;
-    border : 2px solid rgb(43, 202, 43);
+    /* border : 2px solid rgb(43, 202, 43); */
+
+    display: -webkit-flex;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    align-content: center;
+}
+
+div.playArea div{
+    cursor: pointer;
+    border : 1px solid black;
+    /* for three rows */
+    width : 30%;
+    /* for three columns */
+    height : 30%;
+
+    display: -webkit-flex;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+}
+
+div.playArea div.tile_00{
+    border-top: none;
+    border-left: none;
+}
+
+div.playArea div.tile_01{
+    border-top: none;
+}
+
+div.playArea div.tile_02{
+    border-top: none;
+    border-right: none;
+}
+
+div.playArea div.tile_10{
+    border-left: none;
+}
+
+div.playArea div.tile_12{
+    border-right: none;
+}
+
+div.playArea div.tile_20{
+    border-bottom: none;
+    border-left: none;
+}
+
+div.playArea div.tile_21{
+    border-bottom: none;
+}
+
+div.playArea div.tile_22{
+    border-bottom: none;
+    border-right: none;
+}
+
+div.playArea div span{
+    font-weight: bold;
+    font-size: 6em;
 }

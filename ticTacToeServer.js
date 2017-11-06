@@ -1,6 +1,9 @@
 const express = require('express');
 const expressapp = express();
 
+/* register all static directories to be used by express */
+expressapp.use(express.static('libraries'));
+expressapp.use(express.static('scripts'));
 expressapp.use(express.static('stylesheets'));
 expressapp.use(express.static('views'));
 
