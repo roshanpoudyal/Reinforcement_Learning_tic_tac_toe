@@ -3,213 +3,224 @@ $(function(){
     // jQuery vars
     var $body = $("body");
     var $restartButton = $body.children("h1").children("button");
-    var $currentPlayerDisplay = $body.children("h1").children("span");
+    var $currentStatusDisplay = $body.children("h1").children("span");
     var $playArea = $body.children(".playArea");
-    
-    // following X to get fancy X to display on board
-    var unicodeCross = "\u2A2F";
-    /* Players are either "playerX" and "playerO" 
-       Initialize current player to O.*/
-       var currentPlayer = "playerO";
-       var playerX = "playerX";
-       var playerO = "playerO";
-       var player = "player"; // just a variable to contain player string
-
-    /* 
-        State information:
-        0 : player "O" occupies the area.
-        1 : player "X" occupies the area.
-        2 : none of the player occupies the area.
-        Make these state global variables.
-        Following function returns the correct state to be 
-        updated for the boardState
-    */
-
-    var playerOTileState = 0;
-    var playerXTileState = 1;
-    var emptyTileState = 2;
-
-    var tileStateForPlayer = function(currentPlayer){
-        switch(currentPlayer){
-            case playerX : return playerXTileState;
-            case playerO : return playerOTileState;
-            default : return emptyTileState;
-        }
-    }
-    
-    // jquery object that stores all tile dom elements
     var $tiles = $playArea.children("div");
-    
-    // Initial state of the board is all empty.
-    // Remainder : emptyTileState is denoted with 2
-    var boardState = [ 2, 2, 2,
-                       2, 2, 2,
-                       2, 2, 2 ];
 
-    /* References to the board tile for indexing */
-    var boardTileReferences = [ "00", "01", "02",
-                                "10", "11", "12",
-                                "20", "21", "22" ];
-    
-    /* Check for identical elements in row, column or diagonal and return a promise*/
-    var checkWinState = function(){
-        // return a promise on this function call so 
-        // that aschyncronicity, if any, will work
-        return new Promise( function(resolve, reject) {
-            // following array contains all the possible rows and columns
-            // and diagonals of the 3 by 3 matrix starting index at 0 and
-            // implemented with a 1-D array
-            var rowColDigs = ["012", "345", "678", // rows of boardState
-                            "036", "147", "258", // columns of boardState
-                            "048", "246"];       // diagonals of boardState
-            
-            // declared variables to be used later
-            var currentRowColDig;
-            var firstIndexElement;
-            var iscurrentRowColDigEqual;
-            var boardStateElementsForCurrentRowColDig = [];
-            var gameState = [];
-            // initialize gameState with default false values
-            gameState.push({"boardStateElement" : "null"});
-            gameState.push({"whichRowColDig" : "null"});
+    var currentPlayer = "X";
+    /**
+     * Represents the current state (information) of the game
+     *  
+     * @param {any} oldState - stores the older state of the game if any. 
+     * If there is an old state let us UPDATE this state to contain the information 
+     * of the new state of our game else create a new state. This makes us remove the 
+     * redundant steps if we create new state from scratch on every move of the player.
+     */
+    var state = function(oldState){
+        /* whose turn is it in this state? */
+        this.turn = "";
 
-            // iterate through each cell in rowColDigs array
-            // used every() rather than foreach() because of the 3rd reason
-            // given here: https://stackoverflow.com/a/6260865
-            rowColDigs.every(function(value, index){            
-                currentRowColDig = value.split("");
-                // console.log("currentRowColDig :"+ value);
-                // convert each cell value with its number and replace
-                currentRowColDig.forEach(function(value, index){
-                    boardStateElementsForCurrentRowColDig[index] = boardState[parseInt(value)];
-                    // console.log("boardstate value for index "+index+" is "+boardState[parseInt(value)] + " or " + boardStateElementsForCurrentRowColDig[index]);
-                });
-                console.log("currentRowColDigNos :"+ currentRowColDig.toString());
-                console.log("value of boardState for current currentRowColDigNos: "+ boardStateElementsForCurrentRowColDig.toString());
-                
-                
-                // take the first element of the above array and 
-                // compare against every other element in the array
-                firstIndexElement = boardStateElementsForCurrentRowColDig[0];
-                console.log("Value of first index for current row/col/dig: "+boardStateElementsForCurrentRowColDig[0]);
+        /* number of moves of the AI player 
+            initialized to 0*/
+        this.movesCountOfAI = 0;
 
-                // try to test if every element in the now extracted array from boardState are equal
-                // ref: https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_every3
-                // but change the else part in hasSameElements() in above code with "return (el === arr[index - 1]);"
-                // since you are working with arrays and not objects as in the original example in the link
-                function hasSameElements(el,index,arr) {
-                    // Do not test the first array element, as you have nothing to compare to
-                    // Also for our game do not test the cell if the value is 2 since it is the initial 
-                    // state of the board and all element is 2
-                    if (index === 0){
-                        return true;
-                    } else{
-                        //do each array element value match the value of the previous array element
-                        return (el === arr[index - 1]);
-                    } 
-                }
+        /* result of the game in this state
+            still running OR win OR draw - 
+            initialize with still running*/
+        this.result = "still running";
 
-                console.log(boardStateElementsForCurrentRowColDig.every(hasSameElements));
+        /* board config of this state - initialize 
+            with an empty array */
+        this.board = [];
 
-                // if every element in current row or column or diagonal is equal 
-                // update the game state with the value in the same row or column or diagonal
-                // and the row or column or diagonal itself
-                if(boardStateElementsForCurrentRowColDig.every(hasSameElements)){
-                    gameState.boardStateElement = boardStateElementsForCurrentRowColDig[0].toString();
-                    gameState.whichRowColDig = currentRowColDig.toString();                
-                }
-
-                // exit the every() loop on the array as soon as you find that 
-                // there is either a row or a column or a diagnol equal
-                return !boardStateElementsForCurrentRowColDig.every(hasSameElements);            
-            });
-        // send gameState either updated with the winner or just like that with null values via promise
-        if(gameState.boardStateElement != "null"){
-            // return gameState with winStates
-            resolve(gameState);
-        } else{
-            // return a string that NoOneWon
-            reject("NoOneWon");
-        }
-            
-    });
-    }
-
-    /* following function:
-        1. Updates the board state
-        2. Makes the consumed board unclickable */
-    var updateBoard = function(tileConsumed){
-        // return a promise on this function call so 
-        // that aschyncronicity, if any, will work
-        return new Promise( function(resolve, reject) {
-            var updateIndex = boardTileReferences.indexOf(tileConsumed.slice(-2));
-            // update the boardState for index of tile
-            // where the currentPlayer clicked, with current players tile state
-            boardState.splice(updateIndex, 1, tileStateForPlayer(currentPlayer)); 
-            
-            // now udpate current player with next player
-            currentPlayer == playerO ? currentPlayer = playerX : currentPlayer = playerO;
-            
-            // update current player display
-            $currentPlayerDisplay.html(currentPlayer.charAt(currentPlayer.length-1));
-            
-            // check for win state
-            var winStatePromise = checkWinState();
-            winStatePromise.then(function(winStateSuccess){
-                winStateSuccess.push({"winStateMessage":"win"});
-                resolve(winStateSuccess);
-            },function(winStateFailure){
-                // if all tiles are consumed i.e. no empty tile or no 2 on boardState
-                if(boardState.indexOf(2) == -1 && winStateFailure == "NoOneWon"){
-                    // Send Draw Message
-                    winStateFailure = "Draw";
-                    reject(winStateFailure);
-                }else {
-                    winStateFailure = "Continue";
-                    reject(winStateFailure);
-                }
-            });
-        });
-    }
-
-    // event-handler for each board tiles
-    $tiles.click(function(){
-        // disable pointer events on consumed area
-        // change cursor to not-allowed
-        // and display it as red to notify already consumed by O
-        // and display it as blue to notify already consumed by X
-        console.log($(this).attr("class"));
-        var tileColorUpdate;
-        currentPlayer == playerO ? tileColorUpdate = "rgb(243, 191, 191)" : tileColorUpdate = "rgb(175, 167, 241)";
-        $(this).css({
-            "pointer-events": "none",
-            "cursor" : "not-allowed",
-            "background-color" : tileColorUpdate
-        });
-        // update the tile with also the player name
-        // current player on tile
-        var currentPlayerTileName = currentPlayer.charAt(currentPlayer.length-1);
-        currentPlayerTileName == "X" ? currentPlayerTileName = unicodeCross : null;
-        $(this).children("span").html(currentPlayerTileName);
-        
-        // call updateBoard() to update the board state
-        var updateBoardPromise = updateBoard($(this).attr("class"));
-        updateBoardPromise.then(function(winStateSuccess){
-            var boardStateString = boardState[0] + ", " + boardState[1] + ", " + boardState[2] + ", \n" +
-            boardState[3] + ", " + boardState[4] + ", " + boardState[5] + ", \n" +
-            boardState[6] + ", " + boardState[7] + ", " + boardState[8] + "\n" +
-            "You won! Player-"+winStateSuccess.boardStateElement + "\n"+
-            "Row/column/dig was:"+winStateSuccess.whichRowColDig + "\n" +
-            "Winmessage :" + winStateSuccess.winStateMessage;            
-            $playArea.html(boardStateString);
-        },function(winStateFailure){
-            if(winStateFailure = "Draw"){
-                $playArea.html("The Game was a Draw!");
-            }else if(winStateFailure = "Continue"){
-                alert("Next Player May Continue!");
+        /* Update the oldState, if any to construct 
+        new State object for current game */
+        if(typeof oldState !== "undefined"){
+            // copy the board configuration
+            var len = oldState.board.length;
+            this.board = new Array(len);
+            for(var numberOfTiles = 0; numberOfTiles < len; numberOfTiles++){
+                this.board[numberOfTiles] = oldState.board[numberOfTiles];
             }
-        });
+
+            // copy the movesCount, result, and turn of the old state
+            this.movesCountOfAI = oldState.movesCountOfAI;
+            this.result = oldState.result;
+            this.turn = oldState.turn;
+        }
+
+        // method to update the current player
+        this.advanceTurn = function(){
+            // if current player is X make next player O and vice versa
+            this.turn = this.turn === "X" ? "O" : "X";
+        }
+
+        /* count the number of empty cells and return an array containing
+            the indices of the empty cells*/
+        var indices = [];
+        for(var numberOfTiles = 0; numberOfTiles < 0 ; numberOfTiles++){
+            if(this.board[numberOfTiles] === "E"){
+                indices.push(numberOfTiles);
+            }
+            return indices;
+        }
+
+        /* this method checks the terminal state of the game.
+            updates the state's result variable to store the state.
+            returns true if the game is in terminal state or else false */
+        this.isTerminal = function(){
+            // store the board configuration in some local variable
+            var B = this.board;
+
+            /* testify the rows if any of them has all 3 elements same
+                since it is a 3 by 3 game.
+                check the row indices 0-1-2, 3-4-5 and 6-7-8
+                if all have the same element and also not E-empty*/
+            for(var row = 0; row <= 6; row = row + 3){
+                // if same player have consumed a row
+                if(B[i] !== "E" && B[i] === B[i+1] && B[i+1] == B[i+2]){
+                    // update the state result with player who has consumed the row
+                    this.result = B[i] + "-won";
+                    return true;
+                }
+            }
+
+            /* testify the columns if any of them has all 3 elements same
+                since it is a 3 by 3 game.
+                check the column indices 0-3-6, 1-4-7 and 2-5-8
+                if all have the same element and also not E-empty*/
+            for(var column = 0; column <= 2; column = column++){
+                // if same player have consumed a column
+                if(B[i] !== "E" && B[i] === B[i+3] && B[i+3] == B[i+6]){
+                    // update the state result with player who has consumed the column
+                    this.result = B[i] + "-won";
+                    return true;
+                }
+            }
+
+            /* testify the diagonals if any of them has all 3 elements same
+                since it is a 3 by 3 game.
+                check the diagonal indices 0-4-8 and 2-4-6
+                if all have the same element and also not E-empty*/
+            for(var i = 0, j = 4; i <= 2; i = i + 2, j = j - 2){
+                // if same player have consumed a diagonal
+                // for 3 by 3 game the loop will have following two conditionsal
+                // 1st diagonal(0-4-8) => B[0] !== "E" && B[0] === B[4] && B[4] == B[8]
+                // 2nd diagonal(2-4-6) => B[2] !== "E" && B[2] === B[4] && B[4] == B[6]
+                if(B[i] !== "E" && B[i] === B[i + j] && B[i + j] == B[i + 2*j]){
+                    // update the state result with player who has consumed the diagonal
+                    this.result = B[i] + "-won";
+                    return true;
+                }
+            }
+
+            // get the available cells - i.e all empty cells
+            var availableCells = this.emptyCells();
+            // if all cells are consumed or no cells are empty
+            if(availableCells.length == 0){
+                // update the state result of the game as draw
+                this.result = "draw";
+                // and return the termination state of the game as yes - true
+                return true;
+            } else{
+                // return that the game is stll running or has not terminated - flase
+                return false;
+            }
+        }
+    }
+
+    /**
+     * Construct a game object for playing 
+     * @param {any} aiPlayer : the AI player to be played game with (unused for this revision)
+     *  
+     */
+    var game = function(aiPlayer){
+        // initalize the ai player for this game
+        this.ai = aiPlayer;
+
+        // initialize a new game state
+        this.currentState = new state();
+
+        // initialize the new state with empty board state
+        this.currentState.board = [ "E", "E", "E",
+                                    "E", "E", "E",
+                                    "E", "E", "E" ];
+        
+        // X playes first
+        this.currentState.turn = "X";
+
+        // initialize the game state to beginning
+        this.status = "beginning";
+
+        // 
+        /**
+         * 
+         * following method advances the game to new state
+         * @param {any} _state : new state to advance the game to
+         */
+        this.advanceGameTo = function(_state){
+            // update what the current game state will be now
+            this.currentState = _state;
+
+            // if the state is terminal
+            if(_state.isTerminal()){
+                this.status = "Game Ended.";
+                if(_state.result === "X-won"){
+                    // update information that player X won
+                    $currentStatusDisplay.html(_state.result);
+                } else if(_state.result === "O-won"){
+                    // update information that player O won
+                    $currentStatusDisplay.html(_state.result);
+                }else{
+                    // update information that the game was draw
+                    $currentStatusDisplay.html(_state.result);
+                }
+            }else{ // else if the state is not terminal
+                if(this.currentState.turn === "X"){
+                    // update information that the game is player X
+                    $currentStatusDisplay.html(this.currentState.turn);
+                }else{
+                    $currentStatusDisplay.html(this.currentState.turn);
+                }
+            }
+        }
+
+        // start the game
+        this.start = function(){
+            if(this.status = "beginning"){
+                // call advanceGameTo() with initial state
+                this.advanceGameTo(this.currentState);
+                // and update game state to running
+                this.status = "running";
+            }
+        }
+    }
+
+    /* start a new game (for this revision since aiPlayer parameter for
+    game function is unused let us send it value as 'novice') */
+    var newgame = new game("novice");
+    newgame.start();
+
+    // clicking on each tile following event handler fires up
+    $tiles.click(function(){
+        if(newgame.status = "running" && newgame.currentState.turn === "X" && !$(this).hasClass('occupied')){
+            var tileIndex = parseInt($(this).data("index"));
+
+            var next = new state(newgame.currentState);
+
+            next.board[tileIndex] = currentPlayer;
+
+            $(this).children("span").html(next.board[tileIndex]);
+
+            next.advanceTurn();
+
+            newgame.advanceGameTo(next);
+        }
     });
+
+    
+    
+
 
     // event-handler for restart button
     $restartButton.click(function(){
