@@ -57,14 +57,16 @@ $(function(){
 
         /* count the number of empty cells and return an array containing
             the indices of the empty cells*/
-        var indices = [];
-        for(var numberOfTiles = 0; numberOfTiles < 0 ; numberOfTiles++){
-            if(this.board[numberOfTiles] === "E"){
-                indices.push(numberOfTiles);
+        this.emptyCells = function() {
+            var indices = [];
+            for(var numberOfTiles = 0; numberOfTiles < 9 ; numberOfTiles++) {
+                if(this.board[numberOfTiles] === "E") {
+                    indices.push(numberOfTiles);
+                }
             }
             return indices;
         }
-
+       
         /* this method checks the terminal state of the game.
             updates the state's result variable to store the state.
             returns true if the game is in terminal state or else false */
@@ -200,21 +202,55 @@ $(function(){
     game function is unused let us send it value as 'novice') */
     var newgame = new game("novice");
     newgame.start();
+    
+    var AIAction = function(pos) {
+        
+            // public : the position on the board that the action would put the letter on
+            this.movePosition = pos;
+        
+            /*
+             * public : applies the action to a state to get the next state
+             * @param state [State]: the state to apply the action to
+             * @return [State]: the next state
+             */
+            this.applyTo = function(state_) {
+                var next = new state(state_);
+
+                //put the letter on the board
+                next.board[this.movePosition] = state_.turn;
+
+                if(state_.turn === "O")
+                    next.movesCountOfAI++;
+        
+                next.advanceTurn();
+
+                // alert(next.turn);
+                
+                return next;
+            }
+        };
+
+    function takeABlindMove(turn) {
+        var available = newgame.currentState.emptyCells();
+        var randomCell = available[Math.floor(Math.random() * available.length)];
+        
+        var action = new AIAction(randomCell);
+
+        var next = action.applyTo(newgame.currentState);
+        
+        $playArea.children("div[data-index='"+randomCell+"']").children("span").html(turn);
+
+        newgame.advanceGameTo(next);
+    }
 
     // clicking on each tile following event handler fires up
     $tiles.click(function(){
-        if(newgame.status = "running" && newgame.currentState.turn === "X" && !$(this).hasClass('occupied')){
-            var tileIndex = parseInt($(this).data("index"));
-
-            var next = new state(newgame.currentState);
-
-            next.board[tileIndex] = currentPlayer;
-
-            $(this).children("span").html(next.board[tileIndex]);
-
-            next.advanceTurn();
-
-            newgame.advanceGameTo(next);
+        alert(newgame.status);
+        if(newgame.status == "running" && newgame.currentState.turn === "X" && !$(this).hasClass('occupied')){
+            !$(this).hasClass('occupied') ? $(this).attr("class","occupied") : null;
+            $(this).children("span").html(newgame.currentState.turn);
+            newgame.currentState.advanceTurn();
+            takeABlindMove(newgame.currentState.turn);
         }
     });
 
