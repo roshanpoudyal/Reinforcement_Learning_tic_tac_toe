@@ -17,3 +17,6 @@ Implementation of game of tic-tac-toe with reinforcement learning agent.
 3. [How to make your Tic Tac Toe game unbeatable by using the minimax algorithm](https://medium.freecodecamp.org/how-to-make-your-tic-tac-toe-game-unbeatable-by-using-the-minimax-algorithm-9d690bad4b37).
 4. [Implementation of tic-tac-toe](http://www.geeksforgeeks.org/implementation-of-tic-tac-toe-game/).
 5. [Building A Tic-Tac-Toe with javascript.](https://mostafa-samir.github.io/Tic-Tac-Toe-AI/).
+
+### Resources on AI and Machine Learning in general
+1. Great resources on AI and Machine Learning from [Siraj Raval](http://www.youtube.com/c/sirajraval) in his [github repositories](https://github.com/llSourcell?tab=repositories).
