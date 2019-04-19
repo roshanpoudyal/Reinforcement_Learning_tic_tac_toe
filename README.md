@@ -23,7 +23,7 @@ Implementation of game of tic-tac-toe with reinforcement learning agent.
 
 ##### Future directions :
 1. Apply reinforcement learning algorithm on other games. 
-  - Maybe make use of [OpenAI Gym](https://gym.openai.com/) to get the environments or games where you can apply your reinforcement learning algorithms. [OpenAI Gym](https://gym.openai.com/) is a toolkit for developing and comparing reinforcement learning algorithms. It supports teaching agents everything from walking to playing games like Pong or Pinball.
+    - Maybe make use of [OpenAI Gym](https://gym.openai.com/) to get the environments or games where you can apply your reinforcement learning algorithms. [OpenAI Gym](https://gym.openai.com/) is a toolkit for developing and comparing reinforcement learning algorithms. It supports teaching agents everything from walking to playing games like Pong or Pinball.
       - Look [what is OpenAI](https://openai.com/about/).
 
 #### Most importantly, Have Fun 
