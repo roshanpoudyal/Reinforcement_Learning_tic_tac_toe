@@ -2,9 +2,8 @@
 Implementation of game of tic-tac-toe with reinforcement learning agent.
 
 ##### Implementation
-1. First use [Ogre3D](https://www.ogre3d.org/) for front end and interfacing and C++ for backend and RL agent.
-2. After successful implementation of step 1, use Node.js for front end and visualizing the game and interaction. Hence increase reachability to users.
-3. For back end processing of the game use a C++ codebase (reuse the implementation from step 1) i.e [webassembly](https://webassembly.org/) with [node.js](https://www.npmjs.com/package/webassembly).
+1. First use [React.js](https://reactjs.org/) for front end & interfacing and [Node.js](https://nodejs.org/en/) for backend and RL agent logic.
+2. After step 1, transfer the RL agent logic from node.js to a C++ codebase (reuse the implementation from step 1), using [webassembly](https://webassembly.org/) with [node.js](https://www.npmjs.com/package/webassembly).
 
 ##### Resources to get started with Webassembly
 1. [Getting started with webassembly with new C/C++ code.](https://developer.mozilla.org/en-US/docs/WebAssembly/C_to_wasm).
