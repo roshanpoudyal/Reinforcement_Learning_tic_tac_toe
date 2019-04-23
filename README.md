@@ -3,6 +3,9 @@ Implementation of game of tic-tac-toe with reinforcement learning agent.
 
 ##### Implementation
 1. First use [React.js](https://reactjs.org/) for front end & interfacing and [Node.js](https://nodejs.org/en/) for backend and RL agent logic.
+    - You might feel the need for [react-native](https://facebook.github.io/react-native/) during development.
+    - Also [react-redux](https://redux.js.org/basics/usage-with-react) could be useful. Look here for [Why use redux?](https://blog.logrocket.com/why-use-redux-reasons-with-clear-examples-d21bffd5835).
+    - Look for npm packages for react, react-native and react-redux.
 2. After step 1, transfer the RL agent logic from node.js to a C++ codebase (reuse the implementation from step 1), using [webassembly](https://webassembly.org/) with [node.js](https://www.npmjs.com/package/webassembly).
 
 ##### Resources to get started with Webassembly
